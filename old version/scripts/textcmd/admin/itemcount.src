@@ -1,0 +1,13 @@
+use uo;
+
+program itemcount( who )
+
+	var core := polcore();
+	if( !core )
+		SendSysMessage( who, "No core found???!!!!" );
+		return;
+	endif
+
+	SendSysMessage( who, "The current item count is " + CInt(core.itemcount) + "." );
+
+endprogram

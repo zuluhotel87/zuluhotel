@@ -1,0 +1,108 @@
+// Zulu Australia Adduser Script
+//
+// Last Updated: 26/06/01
+//
+// Author: Paul Wyers <crazzykid>
+// Description: Adduser to POL Server 
+//              need I say anymore?
+//
+//
+// 2.0 - total rewrite pretty much!.
+//     - huge bug fix. this fixes a bug with ppl hacking into other accounts.
+//     - removed varibles zhozauthor and zhozversion.. no need.. i just hardcoded it. ;)
+//
+// 1.1 - Update to writehtml
+//     - added varible zhozauthor
+//     - added varible zhozversion
+//
+// 1.0 - initial release
+
+use uo;
+use os;
+use http;
+
+program zuluoz_adduser()
+
+// Grab the acct-name and password from the URL-query 
+// 
+var name := QueryParam( "account" );
+var pass := QueryParam( "password" ); 
+var email := QueryParam( "email" ); 
+var ipaddr := QueryIP();
+var account;
+
+if ( !name || !pass || !email) 
+  writehtml("Account Name, Password or Email was empty or invalid. Please Press Back and try again");
+endif 
+
+// Parse out anything other than upper- and lower-case A-Z chars 
+// 
+var i, ch, temp := ""; 
+var ca := CAsc("a"), cz := CAsc("z"); 
+
+for( i := 1; i <= len(name); i := i + 1 ) 
+  ch := CAsc(lower(name[i])); 
+  if ( (ch >= ca) && (ch <= cz) ) 
+    temp := temp + name[i]; 
+  endif 
+endfor 
+
+if ( len(temp) < 3 ) 
+  writehtml("Account Name, Password or Email was empty or invalid. Please Press Back and try again");
+else 
+  // It's ok  
+  name := temp; 
+endif 
+
+// Check for an existing account (case-insensitive) 
+temp := lower(name); 
+var exists := 0; 
+var acct := ListAccounts( ); 
+
+foreach acctname in acct 
+  if ( temp == lower(acctname) ) 
+    exists := 1; 
+    break; 
+  endif 
+endforeach 
+
+if ( exists ) 
+  writehtml( "Sorry unable to create account <strong>" + name + "</strong><br> This account name is already taken." );
+  return;
+endif 
+
+// Everything looks cool... 
+acct := CreateAccount( name, pass, 1 ); 
+if ( !acct ) 
+  writehtml("Sorry, account creation failed."); 
+else 
+  account := FindAccount(name);
+  account.setprop("Email", email);
+  account.setprop("IP", ipaddr);
+  account.setprop("Notes", "<none>");
+	
+  writehtml( "Welcome " + name + ", Your account has been sucessfully created!<br>" );
+  writehtml( "To start your journy into <strong> Zulu Hotel Australia </strong> follow the instructions below<br>" );
+  writehtml( "run uopatch.exe in your UO directory.. and patch up to latest client..<br>" );
+  writehtml( "Open your login.cfg in your UO dir and delete all the lines and replace with LoginServer=uo.gamiix.com,2593 then save.<br>" );
+  writehtml( "You could also download the Hues from the file section if you wish..</a><br>" );
+  writehtml( "Download one of the clients from the files section and place into your UO dir. (multi allows you to run more than 1 client).<br>" );
+  writehtml( "Run the client and enter your username/password where prompted then select the ZHA shard from the list." );
+  writehtml( "Your username is: <strong>" + name + "</strong> and your password is: <strong>" + pass + "</strong>.<br>" );
+  writehtml( "Thankyou for choosing <strong>Zulu Hotel Australia</strong>.. All accounts not used within 90days will be deleted!<br>" );
+  writehtml( "News and Updates will be put on the website at <a href='http://www.gamiix.com/ultima/'>ultima@gamiix</a><br>" );
+  writehtml( "<p>" );
+  writehtml( "Enjoy!<br>" );
+  writehtml( "- Zulu Hotel Australia" );
+  writehtml( "<p>" );
+  writehtml( "P.S. If you require any assistance please login to our irc server at irc.gamiix.com.au port 6667 and join #uo<br>" );
+
+  writehtml( "<p><strong>Zulu Hotel Australia AddUser Version: <strong>2.0</strong>  create by: <a href='mailto:crazzykid@gamiix.com'>crazzykid</a></strong><br>" );
+
+endif 
+
+writehtml( "</font>" );
+writehtml( "</body>" );
+writehtml( "</html>" );
+
+endprogram

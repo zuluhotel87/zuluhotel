@@ -1,0 +1,35 @@
+use uo; 
+use os; 
+
+program guardedminoc(who,gate) 
+
+if(who.criminal) 
+SendSysMessage(who, "You're not allowed to enter here !"); 
+return;
+endif 
+
+if(who.murderer) 
+SendSysMessage(who, "You're not allowed to enter here, murderer !"); 
+return;
+endif
+
+
+var x := GetObjProperty( gate, "GateDestX" ); 
+var y := GetObjProperty( gate, "GateDestY" ); 
+var z := GetObjProperty( gate, "GateDestZ" ); 
+
+if( !x || !y ) 
+return; 
+endif 
+
+if( !gate || GetObjProperty( who , "JustGated" ) ) 
+EraseObjProperty( who , "JustGated" ); 
+return; 
+endif 
+
+set_critical(1); 
+if( MoveCharacterToLocation( who , x , y , z ) ) 
+SetObjProperty( who, "JustGated", 1 ); 
+endif 
+
+endprogram

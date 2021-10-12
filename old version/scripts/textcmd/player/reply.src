@@ -1,0 +1,25 @@
+//.REPLY BY NEO
+use uo;
+
+program replymsg(who,themessage)
+
+  if (themessage=="") SendSysMessage(who, "Cancelled."); return; endif
+
+  var mobile :="", msgfrom := GetObjProperty(who, "LastMSG");
+
+  foreach onlinechr in EnumerateOnlineCharacters()
+  	if (onlinechr.serial==msgfrom)
+	mobile := onlinechr;
+        endif
+  endforeach
+
+  if (mobile=="") SendSysMessage(who, "That person is offline."); return; endif
+
+  if ((mobile.cmdlevel>0) && (who.cmdlevel==0)) SendSysMessage(who, "You cannot send them messages."); return; endif
+
+  SendSysMessage(mobile, who.name + " : " + themessage,3,0x0026);
+//  SendSysMessage(who, "Your message has been sent.");
+   SendSysMessage(who, "Your message has been sent to " + mobile.name);
+  SetObjProperty(mobile, "#msgfrom", who.serial);
+
+endprogram

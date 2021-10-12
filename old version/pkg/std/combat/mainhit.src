@@ -1,0 +1,22 @@
+use uo;
+use os;
+
+include "include/hitscriptinc";
+
+
+program mainhit(attacker, defender, weapon, armor, basedamage, rawdamage)
+
+	if(attacker == defender) 
+  SendSysMessage( attacker , "The god won't tolerate such a foolishness..." );
+  PlayLightningBoltEffect( attacker );
+  SetAttributeBaseValue( attacker, weapon.skillid, 0 );
+  SetAttributeBaseValue( attacker , SKILLID_TACTICS , 0 );
+  SetAttributeBaseValue( attacker , SKILLID_WRESTLING , 0 );
+  ApplyRawDamage( attacker , attacker.hp+3 );
+  return 0; 
+endif 
+
+	rawdamage := RecalcDmg( attacker, defender, weapon, armor, basedamage );
+	DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+
+endprogram

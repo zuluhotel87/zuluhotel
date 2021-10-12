@@ -1,0 +1,23 @@
+// Zulu  zuluhotel@hotmail.com
+
+use uo;
+use os;
+include "include/client";
+
+program restartserver()
+
+var restarttimer := 4;
+
+while (restarttimer>0)
+    Broadcast( "Server is restarting in " + restarttimer + " minute(s).", FONT_BOLD, 33 );
+    sleep(60);
+    restarttimer := restarttimer -1;
+endwhile
+
+Broadcast("Server is restarting...", FONT_BOLD, 33);
+sleep(1);
+SaveWorldState();
+sleep(1);
+Shutdown();
+
+endprogram

@@ -1,0 +1,39 @@
+use uo;
+use os;
+
+include "include/hitscriptinc";
+include "include/attributes";
+include "include/client";
+
+
+program manadrainscript(attacker, defender, weapon, armor, basedamage, rawdamage)
+
+	var drained;
+	var drainer;
+	
+	rawdamage := RecalcDmg( attacker, defender, weapon, armor, basedamage );
+
+	if( GetObjProperty( weapon, "Cursed" ) )
+		drained := attacker;
+		drainer := defender;
+	else
+		drained := defender;
+		drainer := attacker;
+	endif
+
+	var amount := rawdamage / 2;
+
+	if( amount > GetMana(drained))
+		SetMana(drained, 0);
+	else
+		SetMana(drained, GetMana(drained) - amount);
+	endif
+
+	SetMana(drainer, GetMana(drainer) + amount);
+	if( GetMana(drainer) > GetMaxMana(drainer))
+		SetMana(drainer, drainer.maxmana);
+	endif
+
+	DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+
+endprogram

@@ -1,0 +1,16 @@
+use uo;
+
+program squelch( gm, duration )
+
+	duration := CInt( duration );
+	var who := Target( gm );
+
+	if( who )
+		if( who.cmdlevel > gm.cmdlevel && gm.cmdlevel < 5 )
+			SendSysMessage( who, gm.name + " is trying to squelch you." );
+		else
+			who.squelch( duration );
+		endif
+	endif
+
+endprogram

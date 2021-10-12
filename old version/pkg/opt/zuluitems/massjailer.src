@@ -1,0 +1,23 @@
+use os;
+use uo;
+include "include/client";
+include "include/time";
+include "include/time";
+include "include/classes";
+include "include/dotempmods";
+program fiveminutetimer(player)
+
+sleep(5*60);
+var acc	:= player.acct;
+var offence;
+var days;
+foreach char in EnumerateOnlineCharacters()
+	if (char == player)
+	if (getobjproperty(player,"starttime"))
+		Eraseobjproperty(player,"starttime");
+		SendSysMessage(player,"You took too long to answer!");
+	DisconnectClient( player );
+	endif
+endif
+endforeach
+endprogram

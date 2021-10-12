@@ -1,0 +1,51 @@
+use os;
+use uo;
+use http;
+
+include "include/myutil";
+
+WriteHtml("<html><head><title>Zulu Scandinavia  Merchants</title>" );
+WriteHtml("<body background='http://www.zuluhotel.com/images/bkground.jpg' bgcolor=FFFFFF text=000000 link=0000FF vlink=800080 alink=FF0000><p>" );
+//Writehtml("<center><img src='http://zhs.org.uk/pics/newlogo4.jpg' WIDTH='413' HEIGHT='180'></center><p>");
+
+var merchantserial := CINT (queryparam ("vs"));
+var merchant := SystemFindObjectBySerial (merchantserial);
+if (!merchant)
+	WriteHTML ("That merchant no longer exists.</body></html>");
+	return;
+endif
+
+var x := CINT (merchant.x/8.125);
+var y := CINT (merchant.y/8.008);
+
+WriteHTML ("<P STYLE=\"position:absolute; top:" + y + "; left:" + X + "\"><font color=\"#ff4444\" size=+1>X</font></P>");
+WriteHTML ("<IMG SRC=\"zulumap.jpg\" STYLE=\"position:absolute; top:0; left:0; z-index:-1\"></p>");
+
+WriteHTML ("<div STYLE=\"position:absolute; top:520; left:20\">");
+WriteHTML ("<font size=+2>" + merchant.name + "</font>");
+WriteHTML ("<br>Located at " + merchant.x + ", " + merchant.y);
+
+var storage := FindStorageArea( "Merchant Storage" );
+if (!storage)
+	WriteHTML ("Error opening merchant storage!</body></html>");
+	return;
+endif
+
+var inv_fs := FindRootItemInStorageArea (storage, merchantserial + " 1C");
+if (!inv_fs)
+	WriteHTML ("Error finding merchant storage");
+else
+	var items_for_sale := EnumerateItemsInContainer (inv_fs);
+	foreach item in ListRootItemsInContainer (inv_fs)
+		if ( item.amount > 1 )
+			WriteHTML ("<li>" + item.desc + " at " + item.sellprice + " each");
+		else
+			WriteHTML ("<li>" + item.desc + " at " + item.sellprice);
+		endif
+	endforeach
+endif
+
+
+
+
+WriteHTML ("<br><br><br><br><br></body></html>");

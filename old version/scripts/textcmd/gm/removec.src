@@ -1,0 +1,9 @@
+use uo;
+
+
+function textcmd_uncurse( who )
+
+	var item := Target(who);
+	EraseObjProperty( item, "Cursed" );
+
+endfunction

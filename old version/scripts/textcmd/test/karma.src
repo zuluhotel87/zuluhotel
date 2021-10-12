@@ -1,0 +1,20 @@
+use os;
+use uo;
+
+program setkarma(who, amt)
+
+	if (amt=="") return; endif
+
+	SendSysMessage( who, "Target player." );
+
+    	var chr := Target( who );
+
+	if (chr)
+	  if (chr.acct)
+	  	SendSysMessage( who, "Old Karma: " + GetObjProperty(chr,"Karma") );
+	  	SendSysMessage( who, "New Karma: " + amt );
+	  	SetObjProperty(chr,"Karma",CInt(amt));
+	  endif
+	endif
+
+endprogram

@@ -1,0 +1,14 @@
+use uo;
+use os;
+
+program textcmd_sayabove( who, text )
+    SendSysMessage( who, "What would you like that person or object to say?" );
+
+    var what := Target( who );
+    if (what.character)
+        PrintTextAbove( what, text );
+    else
+	SendSysMessage( who, "This may only be done on players.");   
+    endif
+endprogram
+

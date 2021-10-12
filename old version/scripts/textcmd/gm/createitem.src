@@ -1,0 +1,32 @@
+//
+// .create command - create items
+// Items created with this command will not decay.
+// Two forms:
+//   ".create [objtype] [x] [y] [z]" - specify object type and amount
+//   ".create" - show the item creation menu, create one of that item
+//
+use uo;
+
+program textcmd_create( who, text )
+    if (text)
+        var params := SplitWords( text );
+        var objtype := params[1];
+        var x := CInt( params[2] );
+        var y := CInt( params[3] );
+        var z := CInt( params[4] );
+
+        if (CInt(objtype))
+            objtype := CInt(objtype);
+        endif
+
+if((objtype==0xe77) || (objtype==0xfae))
+return;
+endif
+
+var item := CreateItemAtLocation( x,y, z, objtype, 1 );
+item.decayAt := 0;
+item.movable:=0;
+else
+SendSysMessage( who, ".createitem <objtype> x y z" );
+  endif
+endprogram

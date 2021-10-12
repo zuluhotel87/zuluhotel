@@ -1,0 +1,31 @@
+use uo;
+use os;
+
+include "include/dotempmods";
+include "include/hitscriptinc";
+include "include/areas";
+
+
+program poisonhit(attacker, defender, weapon, armor, basedamage, rawdamage)
+
+	var poison := GetObjProperty( weapon, "Poisonlvl" );
+	var targ;
+
+	if( GetObjProperty( weapon, "Cursed" ) )
+		targ := attacker;
+	else
+		targ := defender;
+	endif
+
+	if( IsInArea( defender, AREAID_CRAFTMINE ) )
+			return 0;
+	
+	elseif ( IsInArea( defender, AREAID_TRINSIC ) )
+		return 0;
+	endif
+
+	SetPoison( targ, poison, "You have been poisoned by " + attacker.name);
+	rawdamage := RecalcDmg( attacker, defender, weapon, armor, basedamage );
+	DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+
+endprogram

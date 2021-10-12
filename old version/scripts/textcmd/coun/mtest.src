@@ -1,0 +1,31 @@
+use os;
+use uo;
+include "include/time";
+program warn_gump(who)
+
+	var tested :=0 ;
+	var IsMacro := GetMacroString();
+	if (IsMacro == "Macroing is not allowed at this time, you will be jailed when caught")
+	SendSysmessage( who, "Mass macro testing..." );
+	foreach mobile in ListMobilesNearLocation( who.x, who.y, who.z, 20 )
+		var player:= mobile;
+		var acc	:= player.acct;
+		if( player and player.strength and acc and player.cmdlevel < 1 )
+			if (!player.dead and !GetObjProperty(player,"starttime"))
+				tested := tested + 1;
+				SetObjProperty( player, "mx", player.x);
+				SetObjProperty( player, "my", player.y);
+				start_script(":zuluitems:masstest", player);
+			endif
+		endif
+	endforeach
+
+	SendSysmessage( who, tested + " players macro tested." );
+
+	else
+
+		SendSysMessage( who, "Mass macro check cancelled" );
+		SendSysMessage( who, IsMacro );
+		return;
+	endif
+endprogram

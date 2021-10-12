@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setdexmod( who, dexmod )
+    SetDexterityMod(who, CInt(dexmod));
+endprogram

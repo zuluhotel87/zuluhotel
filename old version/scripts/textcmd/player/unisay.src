@@ -1,0 +1,96 @@
+use uo;
+use util;
+
+include "include/client";
+
+program textcmd_create( who, text )
+
+    var params := SplitWords( text );
+    var language :=  params[1];
+    var message :=  params[2];
+    var type := params[3];
+    var color := params[4];
+    var font := params[5];
+    if (!language || !message || !type || !color || !font )
+        return;
+    endif
+//    if (type>9 || type<0 || font>9 || font<0 )
+//        return;
+//    endif
+    var lenth := len(message)/2+48;
+    var name :=CAscZ(who.name);
+    var count :=0;
+    var packetstring := "AE";
+    packetstring := packetstring + fixPacketLength(Hex(lenth),2);
+    packetstring := packetstring + fixPacketLength(Hex(who.serial),4);
+    packetstring := packetstring + fixPacketLength(Hex(0),2);
+    packetstring := packetstring + fixPacketLength(type,1);
+    packetstring := packetstring + fixPacketLength(color,2);
+    packetstring := packetstring + fixPacketLength(font,2);
+    packetstring := packetstring + fixPacketLength(Hex(language),4);
+    foreach i in name
+         packetstring := packetstring + fixPacketLength(Hex(i),1);
+    count := count+1;
+    endforeach
+    if(count < 30)
+    packetstring := packetstring + fixPacketLength(Hex(0),30-count);
+    endif
+    packetstring := packetstring + message;     	 
+    if(!who.dead)
+    	foreach chr in ListMobilesNearLocationEx( who.x, who.y, who.z, 12,LISTEX_FLAG_NORMAL+LISTEX_FLAG_HIDDEN+LISTEX_FLAG_GHOST);
+         	SendPacket(chr, packetstring);
+        endforeach
+    else
+       if(who.warmode)
+         var message:="";
+         var i;
+         count := lenth-48;
+         if(count>12)
+           count := 12;
+         elseif(count<1)
+           count := 1;
+         endif
+         for(i := 0;i<count;i:=i+1)
+           if(RandomInt(2))
+            message := message + "O";
+          else
+            message := message + "o";
+          endif
+        endfor
+         foreach chr in ListMobilesNearLocationEx( who.x, who.y, who.z, 12,LISTEX_FLAG_NORMAL+LISTEX_FLAG_HIDDEN+LISTEX_FLAG_GHOST);
+         	if(chr.enabled("hearghosts") || (chr.dead))
+         	  SendPacket(chr, packetstring);
+         	else
+         	  PrintTextAbovePrivate( who, message, chr, 3, CInt("0x"+color)+1 );
+         	endif
+         endforeach
+         PlaySoundEffect( who, RandomInt(5) + SFX_17F);
+        else
+          foreach chr in ListMobilesNearLocationEx( who.x, who.y, who.z, 12,LISTEX_FLAG_GHOST);
+               SendPacket(chr, packetstring);
+          endforeach
+        endif     	  
+    endif
+endprogram
+
+function fixPacketLength( packetstring, byteLength )
+    if( !packetstring || packetstring == error )
+        packetstring := 0;
+    endif
+    packetstring := CStr(packetstring);
+   
+    if( packetstring[1,2] == "0x" )
+        packetstring := CStr(packetstring[3,len(packetstring)]);
+    endif
+   
+    if( len(packetstring) > byteLength * 2 )
+        var extrabytes := (byteLength*2) - len(packetstring);
+        return CStr(packetstring[extrabytes,len(packetstring)]);
+    endif
+   
+    while( len(packetstring) < byteLength * 2 )
+        packetstring := "0" + packetstring;
+    endwhile
+   
+    return packetstring;
+endfunction

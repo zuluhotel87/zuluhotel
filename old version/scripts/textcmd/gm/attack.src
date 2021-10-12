@@ -1,0 +1,28 @@
+use uo;
+
+include "include/client";
+include "include/objtype";
+include "include/skillpoints";
+include "include/bard";
+
+program bard_provoke(character)
+
+	SendSysMessage(character, "Select a creature you wish to provoke");
+
+	var thetarg := Target(character);
+
+	if (!thetarg)
+		SendSysMessage(character, "Targetting canceled.");
+		return;
+	endif
+
+	var ev := array;
+	ev.+ type;
+	ev.+ source;
+
+	ev.source := thetarg;
+	SendEvent(thetarg, ev);
+	ev.type := SYSEVENT_ENGAGED;
+	SendEvent(thetarg, ev);
+
+endprogram

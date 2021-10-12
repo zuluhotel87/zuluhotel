@@ -1,0 +1,30 @@
+use os;
+use uo;
+
+program whois(who)
+	SendSysMessage(who,"Injection test who?");
+	var player:=target(who, TGTOPT_NOCHECK_LOS);
+	if (player.npctemplate or !player or !player.strength)
+		return;
+	endif
+	var det := CreateNpcFromTemplate( "injectiontester", who.x, who.y, who.z, 0 );
+	sleep(4);
+	PrintTextAbove(det, "Please type :");
+	Sleep(1);
+	PrintTextAbove(det, ",injection");
+	var running := 1;
+	var online := 0;
+	while (running and det)
+		foreach char in EnumerateOnlineCharacters()	
+			if (char == player)
+				online := 1;
+			endif
+		endforeach
+		if (online ==0)
+			SendSysMessage(who, player.name+ " logged out.");
+			running := 0;
+		endif
+		online := 0;
+		sleep(1);
+	endwhile
+endprogram

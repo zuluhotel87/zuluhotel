@@ -1,0 +1,38 @@
+use http;
+use uo;
+use os;
+
+program mkaccount()
+
+local UserName := QueryParam( "UserName" );
+local UserPassword := QueryParam( "UserPassword" );
+//local UserEmail := QueryParam( "UserEmail" );
+local UserIP := QueryParam( "UserIP" );
+local UserLogin1 := QueryParam( "UserLogin1" );
+local UserLogin2 := QueryParam( "UserLogin2" );
+local account;
+
+var ret := CreateAccount( UserName, UserPassword, 1 );
+
+WriteHtml( "<html><head><title>Create ZuluHotel 1st Age Account</title><style type=text/css><!--    A:link {text-decoration: none} A:visited {text-decoroation: none} A:active {text-decoration: none}  --></style>" );
+WriteHtml( "<style>.yellow {background:yellow} .blue {background:blue}</style></head>" );
+WriteHtml( "<body bgcolor='#FFFFFF' text='#000000' link='#0000FF' vlink='#800080' alink='#FF0000' background='http://www.zuluhotel.com/images/bkground.jpg'>" );
+WriteHtml( "<p>Welcome " + UserName + ";</p>");
+if( ret == error )
+    writehtml("Sorry, account creation failed.<P>");
+    writehtml("Error: " + ret.errortext );
+else
+account := FindAccount(UserName);
+//account.setprop("Email", UserEmail);
+account.setprop("IP", UserIP);
+account.setprop("Login", UserLogin1+ ", " +UserLogin2);
+account.setprop("Notes", "<none>");
+account.setprop("Release", 0);
+
+WriteHtml( "<p>New user account has been created.<p>Their account information will be emailed to <strong>" + UserEmail +"</strong><br>");
+WriteHtml( "Their username is: <strong>" + UserName + "</strong><br>");
+WriteHtml( "Their password is: <strong>" + UserPassword + "</strong><p>");
+
+endif
+
+endprogram

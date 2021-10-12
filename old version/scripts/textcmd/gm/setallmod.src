@@ -1,0 +1,17 @@
+use uo;
+include "include/attributes";
+
+program textcmd_setallmod( who, newmod )
+
+	var targ := Target( who );
+	if( !targ )
+		return;
+	endif
+
+	newmod := CInt(newmod);
+
+	SetStrengthMod(targ, newmod);
+	SetIntelligenceMod(targ, newmod);
+	SetDexterityMod(targ, newmod);
+
+endprogram

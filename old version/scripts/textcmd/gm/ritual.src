@@ -1,0 +1,12 @@
+use os;
+use uo;
+
+program ritual(who)
+
+	var staff:= CreateItemInBackpack(who, 0xba28, 1);
+	SetObjProperty(staff, "Consecrated", who.serial );
+
+	var robe:=CreateItemInBackpack(who, 0xba29, 1);
+	SetObjProperty(robe, "Consecrated", who.serial );
+
+endprogram

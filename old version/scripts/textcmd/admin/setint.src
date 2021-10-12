@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setint( who, newint )
+    SetBaseIntelligence(who, CInt(newint) );
+endprogram

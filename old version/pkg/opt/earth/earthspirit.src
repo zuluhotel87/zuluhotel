@@ -1,0 +1,44 @@
+use uo;
+use os;
+
+
+include "include/spelldata";
+include "include/client";
+
+program cast_earth_spirit( parms )
+
+	var circle := GetCircle( SPELLID_EARTH_SPIRIT );
+	var caster;
+	var cast_loc;
+
+	if (parms[1] == "#MOB")
+		caster := parms[2];
+		cast_loc := parms[3];
+		if (parms[4])
+			circle := parms[4];
+		endif
+
+	else
+		caster := parms;
+		if( TryToCast( caster, SPELLID_EARTH_SPIRIT ) != SUCCESS )
+			EraseObjProperty( caster, "#Casting" );
+			return;
+		endif
+	
+		cast_loc := CanTargetArea( caster, circle );
+		if (!cast_loc)
+			EraseObjProperty( caster, "#Casting" );
+			return;
+		endif
+	endif
+
+	if(IsInArea(caster, AREAID_TRINSIC) || IsInArea(caster, AREAID_CRAFTMINE))
+	  SendSysMessage(caster, "You cannot cast this kind of spell here.");
+	    EraseObjProperty( caster, "#Casting" );
+	return 0;
+	endif
+
+	EraseObjProperty( caster, "#Casting" );
+	SummonCreature( caster, "earthelementallord", cast_loc );
+
+endprogram

@@ -1,0 +1,10 @@
+use uo;
+
+program newbie( who )
+
+      var what := Target( who );
+	what.newbie := 1;
+
+endprogram
+
+ 

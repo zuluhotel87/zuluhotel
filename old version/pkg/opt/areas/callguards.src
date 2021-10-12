@@ -1,0 +1,88 @@
+use uo;
+use os;
+use npc;
+use math;
+use cfgfile;
+
+include "include/areas";
+include "include/spelldata";
+include "include/client";
+
+
+const SEARCH_RANGE := 8;
+const SPELL_EFFECT_TYPE_MOVING 	:= MOVING_SPELL_CALL_LIGHTNING;
+const SPELL_EFFECT_ID		:= 0;
+const SPELL_EFFECT_SPEED	:= 0;
+const SPELL_EFFECT_LOOP		:= 0;
+
+
+program call_guards_script( who )
+
+	
+
+	if( who.murderer )
+		SendSysMessage( who, "Guards won't answer to murderers' call." );
+		return 0;
+	elseif( who.criminal )
+		SendSysMessage( who, "Guards won't answer to criminals' call." );
+		return 0;
+	elseif( who.dead )
+		SendSysMessage( who, "You cannot call the guards while you're dead." );
+		return 0;
+	elseif( !IsInGuardedArea(who) )
+		SendSysMessage( who, "This isn't a guarded area." );
+		return 0;
+	elseif( LookAround(who) )
+		SendSysMessage( who, "The city guards have come to your rescue." );
+	else
+		SendSysMessage( who, "The guards didn't answer your call since there's nothing to protect you from." );
+	endif
+
+endprogram
+		
+
+function LookAround( who )
+
+	var npc_cfg := ReadConfigFile(":*:npcdesc");
+	var elem;
+	var guard;
+	var found := 0;
+var circle := GetCircle( SPELLID_CALL_LIGHTNING );
+	var element := AIR;
+	var caster;
+	var fromhit;
+
+	foreach mobile in ListMobilesNearLocation( who.x, who.y, who.z, SEARCH_RANGE )
+		if( mobile.IsA(POLCLASS_NPC) )
+			elem := FindConfigElem( npc_cfg, mobile.npctemplate );
+			if( !elem.guardignore && !GetObjProperty(mobile,"guardignore") )
+				if( IsInGuardedArea(mobile) )
+					set_critical(1);
+					guard := CreateNpcFromTemplate( "guard", mobile.x, mobile.y, mobile.z );
+					if( guard )
+						SetObjProperty( guard, "target", mobile.serial );
+					endif
+					set_critical(0);
+					found := 1;
+				endif
+			endif
+		elseif( !mobile.cmdlevel )
+			if( mobile.criminal || mobile.murderer )
+				if( IsInGuardedArea(mobile) )
+					set_critical(1);
+				 PlayLightningBoltEffect( mobile);
+		PlaySoundEffect( mobile, SFX_SPELL_CALL_LIGHTNING );
+	//ApplyElementalDamage( who, mobile, circle, GetHp(mobile),element );
+	ApplyRawDamage( mobile,  GetHp(mobile) );
+
+
+					set_critical(0);
+					found := 1;
+				endif
+			endif
+		endif
+	endforeach
+
+	return found;
+
+endfunction

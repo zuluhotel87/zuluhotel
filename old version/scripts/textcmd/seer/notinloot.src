@@ -1,0 +1,10 @@
+use uo;
+
+program NotInLoot( who )
+
+      var item := Target( who );
+	SetObjProperty( item, "noloot", 1 );
+
+endprogram
+
+ 

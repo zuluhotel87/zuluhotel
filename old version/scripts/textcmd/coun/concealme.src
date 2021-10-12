@@ -1,0 +1,7 @@
+program concealme( who, text )
+    if(cint(text) >= 1 && Cint(text) <= 5)    
+		who.concealed := Cint(text);
+	else    	
+    	who.concealed := 1;
+    endif
+endprogram

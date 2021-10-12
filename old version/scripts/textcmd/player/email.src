@@ -1,0 +1,22 @@
+use uo;
+
+program email( who, email )
+
+if ((email=="") || (!email))
+SendSysMessage( who, "You need to type in a email address.");
+SendSysMessage( who, "usage .email <email>");
+return;
+endif
+
+if (len(email)<8)
+SendSysMessage( who, "Your email is too short.");
+return;
+endif
+
+var account := who.acct;
+
+account.setprop("Email", email);
+
+SendSysMessage( who, "You changed your email to '"+email+"'");
+
+endprogram

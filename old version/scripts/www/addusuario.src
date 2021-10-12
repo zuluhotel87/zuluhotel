@@ -1,0 +1,72 @@
+use uo;
+use os;
+use http;
+
+program adduser()
+
+// Grab the acct-name and password from the URL-query 
+// 
+var name := QueryParam( "account" );
+var pass := QueryParam( "password" ); 
+var email := QueryParam( "email" ); 
+var ipaddr := QueryIP();
+var account;
+
+if ( !name || !pass || !email) 
+  writehtml("<body bgcolor=#000000><font face=verdana color=#ffffff size=1>Account Name, Password or Email was empty or invalid. Please Press Back and try again</font></body>");
+endif 
+
+// Parse out anything other than upper- and lower-case A-Z chars 
+// 
+var i, ch, temp := ""; 
+var ca := CAsc("a"), cz := CAsc("z"); 
+
+for( i := 1; i <= len(name); i := i + 1 ) 
+  ch := CAsc(lower(name[i])); 
+  if ( (ch >= ca) && (ch <= cz) ) 
+    temp := temp + name[i]; 
+  endif 
+endfor 
+if ( len(temp) < 3 ) 
+  writehtml("<body bgcolor=#000000><font face=verdana color=#ffffff size=1>Account Name, Password or Email was empty or invalid. Please Press Back and try again</font></body>");
+else 
+  // It's ok  
+  name := temp; 
+endif 
+
+// Check for an existing account (case-insensitive) 
+temp := lower(name); 
+var exists := 0; 
+var acct := ListAccounts( ); 
+
+foreach acctname in acct 
+  if ( temp == lower(acctname) ) 
+    exists := 1; 
+    break; 
+  endif 
+endforeach 
+
+if ( exists ) 
+  writehtml( "<body bgcolor=#000000><font face=verdana color=#ffffff size=1>Sorry unable to create account <strong>" + name + "</strong><br> This account name is already taken.</body>" );
+  return;
+endif 
+
+// Everything looks cool... 
+acct := CreateAccount( name, pass, 1 ); 
+if ( !acct ) 
+  writehtml("<body bgcolor=#000000><font face=verdana color=#ffffff size=1>Sorry, account creation failed."); 
+else 
+  account := FindAccount(name);
+  account.setprop("Email", email);
+  account.setprop("IP", ipaddr);
+  account.setprop("Notes", "<none>");
+	
+  writehtml( "<body bgcolor=#000000><font face=verdana color=#ffffff size=1>Welcome " + name + ", Your account has been sucessfully created!<br>" );
+
+endif 
+
+writehtml( "</font>" );
+writehtml( "</body>" );
+writehtml( "</html>" );
+
+endprogram

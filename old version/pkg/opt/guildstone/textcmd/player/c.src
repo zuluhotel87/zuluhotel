@@ -1,0 +1,136 @@
+// updated November 4, 2000
+// zulu (zulu@zuluhotel.com)
+
+use uo;
+use os;
+
+var chatlayout :=
+{
+"nomove",
+"nodispose",
+"page 0",
+"resizepic 160 35 5054 320 200",
+"text 200 45 5 0",
+"text 200 70 300 1",
+"text 200 90 300 2",
+"text 200 110 300 3",
+
+"text 200 150 300 4",
+"text 200 170 300 5",
+"text 220 200 0 6",
+"button 350 108 4023 4024 1 0 2000",
+"button 350 168 4023 4024 1 0 3000",
+"radio 170 70 210 211 0 1",
+"radio 170 90 210 211 0 2",
+"radio 170 110 210 211 0 3",
+"radio 170 150 210 211 0 1",
+"radio 170 170 210 211 0 2",
+};
+
+var chatdata :={
+"Select your option and click ok",
+"Hear own guild",
+"Hear all guilds",
+"Hear no guilds",
+"Talk to own guild",
+"Talk to all guilds",
+"use .c <message> to chat"
+};
+
+program use_guild_chat(who,text)
+
+if (who.title_race=="ZuluCTF") return; endif
+
+        var hear,
+            guild_pl := GetObjProperty(who,"guild_id");
+
+        if (guild_pl.errortext)
+                return;
+        endif
+
+        if (text=="")
+                var choose,
+                    box := SendDialogGump(who,chatlayout,chatdata);
+
+                if(box[0]==2000)
+                        foreach k in (box.keys)
+                            if(k>0 && k<1000)
+                              choose:=k;
+                              break;
+                            endif
+                        endforeach
+
+                        SetObjProperty(who,"hearchat",choose);
+                elseif (box[0]==3000)
+                        foreach k in (box.keys)
+                            if(k>0 && k<1000)
+                                choose:=k;
+                                break;
+                            endif
+                        endforeach
+
+                        SetObjProperty(who,"talkchat",choose);
+                else
+                        return;
+                endif
+
+                if (!choose)
+                        return;
+                endif
+
+                hear := GetObjProperty(who,"hearchat");
+                SendSysMessage(who,CStr(chatdata[hear+1]),3,70);
+
+                hear := GetObjProperty(who,"talkchat");
+                SendSysMessage(who,CStr(chatdata[hear+4]),3,70);
+
+                return;
+        else  //text <> ""
+                var addon  := ":",
+                     guild := FindGuild(guild_pl);
+
+                if (guild.getprop("guildabv") != "NONE" &&
+                    GetObjProperty(who,"abv")  == "0")
+                        addon := " ["+guild.getprop("guildabv")+"]:";
+                endif
+
+                if (GetObjProperty(who,"talkchat") == 1) // talk to own
+                        msgown(who, CStr(who.name+addon+" "+text), guild);
+                else // talk to all
+                        msgall( CStr(who.name+addon+" "+text), guild_pl);
+                endif
+        endif
+
+endprogram
+
+
+function msgown(me, msg, guild)
+
+        var members := guild.members;
+       
+        foreach mobile in members
+            if (GetObjProperty(mobile,"hearchat") != 3)
+                SendSysMessage(mobile, msg, 3, 68);
+            endif
+        endforeach
+
+endfunction
+
+
+function msgall(msg,guild_pl)
+var guilds:=ListGuilds();
+var guild;
+var members;
+var hear;
+foreach guild in guilds
+	members := guild.members;
+	foreach mobile in members
+	hear:=GetObjProperty(mobile,"hearchat");
+	if  ( ( GetObjProperty(mobile,"guild_id")==guild_pl) && (hear!=3) )
+			SendSysMessage(mobile, msg, 3, 68);
+		elseif (hear==2)
+			SendSysMessage(mobile, msg, 3, 44);
+		endif
+	endforeach
+endforeach
+endfunction

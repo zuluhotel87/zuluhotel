@@ -1,0 +1,10 @@
+use uo;
+
+program textcmd_bcast( who )
+
+    var wtext := CStr(RequestInput( who, who.backpack, "Message:" ));
+    var wfont := CInt(RequestInput( who, who.backpack, "Font:" ));
+    var wcolor := CInt(RequestInput( who, who.backpack, "Color:" ));
+
+    Broadcast( who.name + ": " + wtext, wfont, wcolor );
+endprogram

@@ -1,0 +1,135 @@
+use uo;
+use os;
+use cfgfile;
+include "include/hitscriptinc";
+include "include/areas";
+
+var speech;
+
+program WrestlingHitScript(attacker, defender, weapon, armor, basedamage, rawdamage)
+  
+if(attacker == defender) 
+  SendSysMessage( attacker , "The god won't tolerate such a foolishness..." );
+  PlayLightningBoltEffect( attacker );
+  SetAttributeBaseValue( attacker, weapon.skillid, 0 );
+  SetAttributeBaseValue( attacker , SKILLID_TACTICS , 0 );
+  SetAttributeBaseValue( attacker , SKILLID_WRESTLING , 0 );
+  ApplyRawDamage( attacker , attacker.hp+3 );
+  return 0; 
+endif 
+
+if( IsInArea( defender, AREAID_CRAFTMINE ) ) //safe zone
+	    if (defender.isA(POLCLASS_NPC) || attacker.isA(POLCLASS_NPC))
+		var master:=GetObjProperty(defender, "master");
+		if(master)
+		SetObjProperty( defender, "guardkill", 1);
+		ApplyRawDamage( defender, CInt(GetHp(defender)+3) );
+		return;
+else		
+
+		SendSysMessage(attacker,"We wont tolerate this foolishness...");
+		
+ 			 //NPC THING
+			SetObjProperty( defender, "guardkill", 1);
+			ApplyRawDamage( defender, CInt(GetHp(defender)+3) );
+		
+		SetObjProperty( attacker, "guardkill", 1); 
+		ApplyRawDamage(attacker, CInt(GetHp(attacker)+3) );
+		return;
+	endif
+	endif               
+ 		SetObjProperty(attacker,"prohibitedspar",ReadGameClock());
+		SetObjProperty(defender,"prohibitedspar",ReadGameClock());
+		start_script(":zuluitems:dontspar", attacker);
+		start_script(":zuluitems:dontspar", defender);
+		rawdamage:=0;
+	elseif( IsInArea( defender, AREAID_TRINSIC ) ) //safe zone
+		if (defender.isA(POLCLASS_NPC) || attacker.isA(POLCLASS_NPC))
+	var master:=GetObjProperty(defender, "master");
+
+		if(master)
+		SetObjProperty( defender, "guardkill", 1);
+		ApplyRawDamage( defender, CInt(GetHp(defender)+3) );
+		return;
+else		
+		SendSysMessage(attacker,"We wont tolerate this foolishness...");
+		
+ 			//NPC THING
+			SetObjProperty( defender, "guardkill", 1);
+			ApplyRawDamage( defender, CInt(GetHp(defender)+3) );
+		
+		SetObjProperty( attacker, "guardkill", 1); 
+		ApplyRawDamage(attacker, CInt(GetHp(attacker)+3) );
+		return;
+	endif
+	endif                
+ 		SetObjProperty(attacker,"prohibitedspar",ReadGameClock());
+		SetObjProperty(defender,"prohibitedspar",ReadGameClock());
+		start_script(":zuluitems:dontspar", attacker);
+		start_script(":zuluitems:dontspar", defender);
+		rawdamage:=0;
+	endif
+
+
+if(defender.isA(POLCLASS_NPC))
+    basedamage := basedamage * 2;
+    rawdamage := rawdamage * 2;
+  endif
+  var weaponhit := GetObjProperty(attacker, "OnHit");
+  var armorhit;
+  if (armor == 0)
+    armorhit := GetObjProperty(defender, "OnHit");
+  else
+    armorhit := GetObjProperty(armor, "OnHit");
+  endif
+  var x;
+  if (!weaponhit)
+    if (!armorhit)
+      start_script("reactivearmorhit", { attacker, defender, weapon, armor, basedamage, rawdamage } );
+      rawdamage := GetObjProperty(defender, "TempDamage");
+      if(rawdamage < 1)
+        rawdamage := 1;
+      endif
+      DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+      SetObjProperty(defender, "LastHit", {attacker.name, attacker.serial, weapon });
+      return;
+    else
+      SetObjProperty(defender, "TempDamage", rawdamage);
+      foreach x in armorhit
+        Detach();
+        set_critical(0);
+        start_script(x, { attacker, defender, weapon, armor, basedamage, rawdamage } );
+        rawdamage := CInt(GetObjProperty(defender, "TempDamage") );
+      endforeach
+      EraseObjProperty(defender, "TempDamage");
+      start_script("reactivearmorhit", { attacker, defender, weapon, armor, basedamage, rawdamage } );
+      rawdamage := GetObjProperty(defender, "TempDamage");
+      if(rawdamage < 1)
+        rawdamage := 1;
+      endif
+      DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+      SetObjProperty(defender, "LastHit", {attacker.name, attacker.serial, weapon });
+      return;
+    endif
+  else
+    SetObjProperty(defender, "TempDamage", rawdamage);
+    foreach x in weaponhit
+      Detach();
+      set_critical(0);
+      start_script(CStr(x), { attacker, defender, weapon, armor, basedamage, rawdamage } );
+      rawdamage := GetObjProperty(defender, "TempDamage");
+    endforeach
+    EraseObjProperty(defender, "TempDamage");
+    if (rawdamage < 1)
+      rawdamage := 1;
+    endif
+    start_script("reactivearmorhit", { attacker, defender, weapon, armor, basedamage, rawdamage } );
+    rawdamage := GetObjProperty(defender, "TempDamage");
+    if(rawdamage < 1)
+      rawdamage := 1;
+    endif
+    DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+    SetObjProperty(defender, "LastHit", {attacker.name, attacker.serial, weapon});
+    return;
+  endif
+endprogram

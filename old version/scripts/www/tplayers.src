@@ -1,0 +1,5 @@
+use http;
+use uo;
+
+var players := EnumerateOnlineCharacters();
+WriteHtml( "<meta http-equiv='Refresh' content='0; URL=http://www.zuluhotel.com/default.asp?p="+len(players)+"'>" );

@@ -1,0 +1,15 @@
+use uo;
+
+include "include/client";
+
+program textcmd_changemount( who )
+
+	var mount := GetEquipmentByLayer( who, LAYER_MOUNT );
+	if( !mount )
+		SendSysMessage( who, "You must be already mounted to use this command." );
+		return;
+	endif
+
+	DestroyItem( mount );
+
+endprogram

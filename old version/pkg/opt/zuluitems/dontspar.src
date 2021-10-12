@@ -1,0 +1,28 @@
+use os;
+use uo;
+
+include "include/client";
+include "include/time";
+include "include/time";
+include "include/classes";
+include "include/dotempmods";
+
+program dontspar(client)
+var before := ReadGameClock();
+sleep(5);
+
+var acc	:= client.acct;
+var playername := CStr( client.name );
+       
+if (GetObjProperty(client,"prohibitedspar"));
+	EraseObjProperty(client,"prohibitedspar");
+	SendSysMessage(client,"I warned you to not spar here!");
+	acc.setprop( "Release", (ReadGameClock() + 172800 ));
+	MoveCharacterToLocation( client, 5304, 1184, 0, 0 );
+	var after := ReadGameClock();
+	SendSysMessage( client, "You have been jailed for two days. Reason: Breaking Shard rules." );
+	sleep(5);
+	DisconnectClient(client);
+endif
+
+endprogram

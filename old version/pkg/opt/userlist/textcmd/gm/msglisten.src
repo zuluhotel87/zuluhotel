@@ -1,0 +1,17 @@
+use uo;
+
+include "../../userlist";
+
+program textcmd_msglisten(character, opts)
+
+	if(upper(opts)=="OFF")
+		opts:=0;
+	elseif(upper(opts)=="ON")
+		opts:=1;
+	else
+		SendSysMessage(character, "USE: .msglisten [on,off]");
+		return;
+	endif
+	UserList(EVID_USERLIST_LISTEN, character, opts);
+
+endprogram

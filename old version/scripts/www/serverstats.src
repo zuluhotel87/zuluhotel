@@ -1,0 +1,47 @@
+use http;
+use uo;
+
+var system := polcore();
+var itemcount := polcore().itemcount;
+var mobcount := polcore().mobilecount;
+var load := system.sysload;
+var uptime := system.uptime;
+var struptime;
+
+uptime := uptime / 60;
+
+if (uptime > 60)
+  uptime := uptime /60;
+  struptime := CStr(uptime) + " hours";
+else
+  struptime := CStr(uptime) + " minutes";
+endif
+writehtml("<HTML><head>");
+writehtml("<link rel=stylesheet type=text/css media=all href=neo.css>");
+writehtml("</head>");
+writehtml("<body bgcolor=#000000 topmargin=0 leftmargin=0 background=back_news2.jpg>");
+writehtml("<table border='0' width='400' cellspacing='0' cellpadding='0'><tr><td width='435'><p align='justify'><b><font size='2' face='Verdana' color='#C0C0C0'>");
+writehtml("Zulu Hotel First Age Server Status</font></b><br><br><font face=Verdana size=2 color=#FFFFFF><b>");
+writehtml("Server Harware:</b></font><p align='justify'><font face='Verdana' size='2' color='#FFFFFF'><i>CPU:</i>");
+writehtml("</font><font face='Verdana' size='2' color='#FF0000'>Intel Pentium IV 3.20ghz</font><font face='Verdana' size='2' color='#FFFFFF'><br><i>RAM:</i>");
+writehtml("</font><font face='Verdana' size='2' color='#FF0000'> 2048 DDR 400mhz</font><font face='Verdana' size='2' color='#FFFFFF'><br><i>HD:</i></font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'> Maxtor DiamondMax 120Gb 7200rpm</font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'><br><i>OS:</i></font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'> Windows 2003 Server</font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'><br><i>Connection Bandwidth:</i>");
+writehtml("</font><font face='Verdana' size='2' color='#FF0000'> 8mbits</font><p align='justify'><font face='Verdana' size='2' color='#FFFFFF'><b>");
+writehtml("Shard Statistics:</b></font><p align='justify'><font face='Verdana' size='2' color='#FFFFFF'>");
+writehtml("Current Number of Accounts: </font><font face='Verdana' size='2' color='#FF0000'>" + len(ListAccounts()) + "<br></font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'>Total NPCs in the World: </font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'>" +  mobcount + "</font><br><font face='Verdana' size='2' color='#FFFFFF'>");
+writehtml("Total Item Count: </font><font face='Verdana' size='2' color='#FF0000'>" + itemcount + "<br></font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'>Current Uptime Since Restart:</font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'>" + struptime + "<br></font>");
+WriteHtml("<font color='#FFFFFF'>Current Server Load: </font><font face='Verdana' size='2' color='#FF0000'>" + cstr(system.sysload) + " %<br></font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'> Longest Server Uptime: </font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'> 13 days<br></font>");
+writehtml("<font face='Verdana' size='2' color='#FFFFFF'> Server Timezone and Location:</font>");
+writehtml("<font face='Verdana' size='2' color='#FF0000'>  GMT +1 , Mora, Sweden</font>");
+writehtml("<p align='center'>&nbsp;</p><p align='center'><font face='Verdana' size='2' color='#FFFFFF'><a href='javascript:history.back()'>[back]</a></font>");
+writehtml("<p>&nbsp;</td></tr></table>");
+writehtml("</body></html>");

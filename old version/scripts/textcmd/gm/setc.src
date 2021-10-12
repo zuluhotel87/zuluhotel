@@ -1,0 +1,9 @@
+use uo;
+
+
+function textcmd_setcurse(who)
+
+	var item := Target(who);
+	SetObjProperty( item, "Cursed", 1);
+
+endfunction

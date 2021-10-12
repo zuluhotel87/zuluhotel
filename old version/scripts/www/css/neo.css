@@ -1,0 +1,27 @@
+body
+{
+	font-family: Verdana,Arial,Sans-serif;
+	background-color: #000000;
+	margin: 8px;
+	scrollbar-base-color: #000000;
+}
+.itemMenu
+{
+	text-align: center;
+	padding: 3px;
+	background-color: #000000;
+        color: #ffffff;
+        font-size: 13px;
+        font-family: Verdana,Arial,Sans-serif;
+}
+a
+{
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: transparent;
+}
+a:hover
+{
+	color: #FFFFFF;
+	text-decoration: underline;
+}

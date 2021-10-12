@@ -1,0 +1,29 @@
+/* Renounce newbie status */
+use uo;
+use os;
+
+include "include/yesno";
+
+program renounce(who)
+
+	var newbieflag := GetObjProperty(who, "newbie");
+	if (newbieflag==999 || newbieflag==0)
+		SendSysMessage(who, "You are no longer a newbie");
+		return 0;
+	endif
+
+	var answer:=YesNo(who,"Renounce Newbie Status?");
+
+	if (!answer)
+		SendSysMessage(who,"canceled renounce, you are still a newbie");
+	else
+		var result:=find(who.name," [New]",1),name:=who.name;
+		if (result)
+			result:=result-1;
+			name:=name[1,result];
+			who.name:=name;
+  		endif
+  		SetObjProperty(who,"newbie", 999);
+  		SendSysMessage(who,"Newbie status removed, beware the pk");
+  	endif
+endprogram

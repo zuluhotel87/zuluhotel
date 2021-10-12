@@ -1,0 +1,24 @@
+use os;
+use uo;
+include "include/attributes";
+
+program textcmd_kill( who )
+
+	var tgt := TargetCoordinates( who );
+	if( tgt.mobile )
+ 		var mob := tgt.mobile;
+
+		if( mob.cmdlevel > who.cmdlevel && who.cmdlevel < 5 )
+			SendSysMessage( who, "You cant kill him, he is superior to you." );
+			SendSysMessage( mob, who.name + " is trying to kill you." );
+		
+		elseif( !mob.dead )
+			RevokePrivilege( mob, "invul" );
+			SetObjProperty( mob, "guardkill", 1);
+			ApplyRawDamage( mob, CInt(GetHp(mob)+3) );
+		else
+			SendSysMessage( who, "That Tickles!" );
+		endif
+	endif
+   
+endprogram

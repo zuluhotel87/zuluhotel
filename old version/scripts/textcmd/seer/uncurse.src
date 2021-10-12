@@ -1,0 +1,17 @@
+use uo;
+include "include/namingbyenchant";
+
+program uncurse( who )
+
+	var what := TargetCoordinates( who );
+    	if (what)
+        	if (what.item)
+			BanishCurse( what );
+		else
+			SendSysMessage( who, "You can only target an item " );
+		endif
+	endif
+
+endprogram
+
+ 

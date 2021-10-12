@@ -1,0 +1,115 @@
+use http;
+use uo;
+use os;
+
+include "include/findcity";
+
+program dummy()
+
+var system := polcore();
+var itemcount := GameStat( "itemcount" );
+var mobcount := gamestat("mobilecount");
+var load := system.load;
+var uptime := system.uptime;
+var struptime;
+var vguard, team, totalplayers, players;
+
+uptime := uptime / 60;
+
+if (uptime > 60)
+        uptime := uptime /60;
+        struptime := cstr(uptime) + " hours";
+else
+        struptime := cstr(uptime) + " minutes";
+endif
+
+WriteHtml("<html><head><title>Zulu Hotel 1st Age  Status</title><style type=text/css><!--    A:link {text-decoration: none} A:visited {text-decoroation: none} A:active {text-decoration: none}  --></style>" );
+WriteHtml("<style>.yellow {background:yellow} .blue {background:blue}</style><meta http-equiv=Refresh content=200></head>" );
+WriteHtml("<body background='http://www.ZH1a.com/images/bkground.jpg' bgcolor=FFFFFF text=000000 link=0000FF vlink=800080 alink=FF0000>" );
+Writehtml("<center><img src='http://' WIDTH='413' HEIGHT='180'></center><p>");
+Writehtml("<blockquote>");
+Writehtml("  <div align=left>");
+Writehtml("    <p><font size=5 face=Morpheus><b>Server Hardware:</b>");
+Writehtml("      </font></p>");
+Writehtml("  </div>");
+Writehtml("  <blockquote>");
+Writehtml("    <div align=left><font face=Verdana, Arial, Helvetica, sans-serif size=2>CPU: ");
+Writehtml("      Intel PIII - 450<br>");
+Writehtml("      RAM: 2048Mb<br>");
+Writehtml("      HDD: 9Gb UW2 SCSI<br>");
+Writehtml("      OS: Windows<br>");
+Writehtml("      Connection: 8Mbits</font></div>");
+Writehtml("  </blockquote>");
+Writehtml("  <div align=left> ");
+Writehtml("    <p><font size=5 face=Morpheus><b>Shard Statistics:</b></font></p>");
+Writehtml("  </div>");
+Writehtml("  <blockquote>");
+Writehtml("    <div align=left>");
+Writehtml("      <p><font face=Verdana, Arial, Helvetica, sans-serif size=2>Current number of accounts: 3512<br>");
+Writehtml("        Total NPCs in the world:" +  mobcount + "<br>");
+Writehtml("        Total item count:" + itemcount + "<br>");
+WriteHtml("        Current Uptime since last restart : "+ struptime + "<br>");
+WriteHtml("        Current Server Load : " + cstr(system.sysload) + " % <br>");
+Writehtml("        Longest server uptime: 160 hours (6 days 7 hours)<br>");
+Writehtml("        Server Timezone: Central Time (GMT -5)<br>");
+Writehtml("        Server Location: </font></p>");
+Writehtml("    </div>");
+Writehtml("  </blockquote>");
+Writehtml("</blockquote>     ");
+
+Writehtml("<blockquote> ");
+Writehtml("  <div align=left> ");
+
+players := EnumerateOnlineCharacters();
+totalplayers :=len(players);
+
+Writehtml("    <p><font size=5 face=Morpheus><b>"+totalplayers+ " Players Online:</b></font></p>");
+Writehtml("  </div>");
+/*
+Writehtml("  <blockquote>");
+Writehtml("    <div align=left>");
+
+foreach chr in players
+team :=getobjproperty(chr, "team");
+vguard := getobjproperty(chr,"guardtype");
+If (chr.cmdlevel=0)
+
+if (team="BLUE")
+WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " <font color=0000ff>Playing CTF</font></font></td></tr><br>" );
+elseif (team="RED")
+WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " <font color=ff0000>Playing CTF</font></font></td></tr><br>" );
+elseif (vguard=2)
+WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2><font color=ff0000>Chaos</font> " + chr.name + " is in " + findcity(chr) + " Territory</font></td></tr><br>" );
+elseif (vguard=1)
+WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2><font color=0000ff>Order</font> " + chr.name + " is in " + findcity(chr) + " Territory</font></td></tr><br>" );
+else
+WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " is in " + findcity(chr) + " Territory</font></td></tr><br>" );
+endif
+// Else
+// if (team="BLUE")
+// WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " <font color=00dd00>staff</font> <font color=0000ff>Playing CTF</font></font></td></tr><br>" );
+// elseif (team="RED")
+// WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " <font color=00dd00>staff</font> <font color=ff0000>Playing CTF</font></font></td></tr><br>" );
+// else
+// WriteHtml( "<tr><td><font face=Verdana, Arial, Helvetica, sans-serif size=2>" + chr.name + " is in " + findcity(chr) + " Territory <font color=00dd00>staff</font></font><br></td></tr>" );
+//endif
+
+Endif
+endforeach
+
+Writehtml("</div>");
+Writehtml("</blockquote>");
+*/
+
+Writehtml("</blockquote>");
+/*
+WriteHtml( "<br>" );
+
+WriteHtml( "<hr color=67594E align=center><font size=1 face=helvetica><span CLASS=YELLOW>" );
+
+WriteHtml( "The page is updated in real time every 5 minutes and will automatically reload.</span>" );
+*/
+WriteHtml( "<br>Server Version: POL 093 <br>Administrator:" );
+WriteHtml( "<a href=mailto:andreasgidlund_88@hotmail.com>Mr Thuril</a><br></body></html>" );
+
+endprogram

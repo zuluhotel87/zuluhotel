@@ -1,0 +1,10 @@
+use uo;
+use os;
+
+program identify( who )
+
+	start_script( ":itemid:itemid", who );
+
+endprogram
+
+ 

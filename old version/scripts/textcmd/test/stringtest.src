@@ -1,0 +1,15 @@
+use os;
+use uo;
+use util;
+use basic;
+
+program textcmd_stringtest( who, text )
+
+	var splited	:= SplitWords( text );
+	var the_str	:= splited[1];
+	var start	:= CInt(splited[2]);
+	var unknown	:= CInt(splited[3]);
+
+	SendSysMessage( who, "Result is : " + the_str[ start, unknown ] );
+
+endprogram

@@ -1,0 +1,20 @@
+use uo;
+
+
+program nukearea( who, text )
+    var ranget := CInt( text );
+    var z := who.z - ranget;
+    var zstop := who.z + ranget;
+   
+    for( z; z <= zstop; z := z + 1 )
+    	foreach thingie in ListItemsNearLocation( who.x, who.y, z, ranget );
+        	if (thingie.objtype==0xa300)
+		DestroyItem( thingie );
+		return;
+		endif
+    	endforeach
+    endfor
+
+    SendSysMessage(who, "Destroyed spawnpoints in a radius of " + ranget);
+       
+endprogram

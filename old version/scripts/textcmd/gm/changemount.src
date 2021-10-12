@@ -1,0 +1,26 @@
+use uo;
+
+include "include/client";
+
+program textcmd_changemount( who, parms )
+
+	var split := SplitWords( parms );
+	var newgraphic := CInt(split[1]);
+	if( !newgraphic )
+		SendSysMessage( who, "Structure is .changemount <graphic> <color>" );
+		return;
+	endif
+
+	var mount := GetEquipmentByLayer( who, LAYER_MOUNT );
+	if( !mount )
+		SendSysMessage( who, "You must be already mounted to use this command." );
+		return;
+	endif
+
+	mount.graphic := newgraphic;
+
+	if( CInt(split[2]) )
+		mount.color := CInt(split[2]);
+	endif
+
+endprogram

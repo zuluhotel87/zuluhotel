@@ -1,0 +1,357 @@
+use uo;
+use os;
+use math;
+
+include "include/dotempmods";
+include "include/attributes";
+include "include/objtype";
+include "include/client";
+include "include/possess";
+include "include/reportmurder";
+include "include/yesno";
+include "../../pkg/opt/karmafame/karmafame";
+include "include/dismount";
+include "include/myutil";
+include "include/res";
+include "include/playmusic";
+include "include/camouflage";
+include "include/constants/propids";
+
+program chrdeath(corpse,ghost)
+
+	set_critical(1);
+
+	EraseObjProperty( ghost, "KilledBy" );
+	EraseObjProperty( ghost, PROPID_MOBILE_KILLED_BY );
+	EraseObjProperty( ghost, PROPID_MOBILE_GUARD_KILLED );
+	EraseObjProperty( ghost, PROPID_MOBILE_MAGIC_REFLECTION );
+
+	// ctf stuff here
+	var team:=GetObjProperty(ghost,"team");
+	if( team=="BLUE")
+		teamctf(ghost,corpse);
+		DestroyItem(corpse);
+		MoveCharacterToLocation(ghost,6047,223,44);
+		return;
+	endif
+
+	if( team=="RED")
+		teamctf(ghost,corpse);
+		DestroyItem(corpse);
+		MoveCharacterToLocation(ghost,6039,407,0);
+		return;
+	endif
+
+	SetObjProperty( corpse, PROPID_CORPSE_CORPSE_OF, ghost.serial );
+
+	var running_quest := GetGlobalProperty(PROPID_GLOBAL_RUNNING_QUEST);
+	if( running_quest )
+		var participating := GetObjProperty( ghost, PROPID_MOBILE_PARTICIPATING_QUEST );
+		if( participating )
+			if( participating == running_quest )
+				SetObjProperty( corpse, PROPID_MOBILE_CANT_BE_LOOTED, 1 );
+			else
+				EraseObjProperty( ghost, PROPID_MOBILE_PARTICIPATING_QUEST );
+			endif
+		endif
+	endif
+
+	// anti looting stuff
+	if( !ghost.criminal )
+		if( !ghost.murderer )
+			if( !GetObjProperty( corpse, PROPID_MOBILE_GUARD_KILLED ) )
+				SetObjProperty( corpse, PROPID_CORPSE_IS_BLUE, 1 );
+				corpse.color := 90;
+			endif
+		endif
+	endif
+
+	// Anti looting bug fix for bags.
+	foreach item in EnumerateItemsInContainer(corpse)
+	   if( item.IsA(POLCLASS_CONTAINER) )
+	   	if( item.container == corpse )
+			if( item.usescript )
+				SetObjProperty( item, "old_us", item.usescript );
+			endif
+			item.usescript := ":loot:noview";
+		endif
+	   endif
+	endforeach
+
+	ReequipCursed(ghost,corpse);
+	CurePoison(ghost);
+	
+
+
+	var free_death := GetObjProperty( ghost, PROPID_MOBILE_FREE_DEATH );
+	if( free_death && !ghost.multi )
+		free_death := CInt(free_death);
+		free_death := free_death - 1;
+		if( free_death )
+			SetObjProperty( ghost, PROPID_MOBILE_FREE_DEATH, free_death );
+		else
+			EraseObjProperty( ghost, PROPID_MOBILE_FREE_DEATH );
+		endif
+
+
+		Resurrect(ghost);
+		SetHp(ghost,GetMaxHp(ghost));
+		SetMana(ghost,GetMaxMana(ghost));
+		SetStamina(ghost,GetMaxStamina(ghost));
+		ghost.warmode:= 0;
+		ghost.hidden := 1;
+		
+		// Harl- removed this section while there is a problem with moveitemtocontainer
+				
+		//foreach item in EnumerateItemsInContainer( corpse )
+		//	MoveItemToContainer( item, ghost.backpack );
+		//endforeach
+		
+		//DestroyItem(corpse) 
+		
+		return;
+	endif
+
+	AwardFame( ghost, FAME_LOST_ON_DEATH );
+	if( !GetObjProperty( corpse, PROPID_MOBILE_GUARD_KILLED ) )
+		AdviseAttackers(ghost);
+	endif
+
+	if( !ghost.cmdlevel )
+		RevokePrivilege(ghost,"hearghosts");
+		RevokePrivilege(ghost,"seeghosts");
+	endif
+
+	var temp:=GetObjProperty(ghost,"realname");
+
+	if (temp)
+		SetName(ghost,temp);
+		EraseObjProperty(ghost,"realname");
+	endif
+
+	if (GetObjProperty(ghost,"origform"))
+		EraseObjProperty(ghost,"origform");
+		ghost.frozen:=0;
+	endif
+
+	// druid spell shapechange
+	temp:=GetObjProperty(ghost,"tn");
+	if (temp)
+		SetName(ghost,temp);
+		EraseObjProperty(ghost,"tn");
+		EraseObjProperty(ghost,"tc");
+		EraseObjProperty(ghost,"tg");
+	endif
+
+	// CAmouflage Check
+	temp := GetObjProperty(ghost, "cmfc");
+	if (temp)
+		RemoveCamouflage( ghost );
+	endif
+
+	if( ghost.dead && (ghost.graphic != 0x192) && (ghost.graphic != 0x193) )
+	  	ghost.graphic := 402 + CInt(ghost.gender);
+	endif
+
+	set_critical(0);
+
+	if(len(ghost.reportables)>0)
+		SendReportGump(ghost);
+	endif
+
+	set_critical(1);
+	EraseObjProperty(ghost,"mr");
+
+	var corpsename:=ghost.name;
+	var mount;
+	foreach item in ListRootItemsInContainerOfObjtype(corpse,0xf021)
+		mount:=item;
+	endforeach
+
+	if(mount) Dismount(ghost,mount); endif
+
+	set_critical(0);
+
+	if(ghost.cmdlevel)
+		if (GetObjProperty(ghost,"possess"))
+			unpossesscorpse(ghost,corpse);
+		endif
+		return;
+	endif
+
+	if(GetObjProperty(ghost,"freedeath"))
+		EraseObjProperty(ghost,"freedeath");
+		Resurrect(ghost);
+		SetHp(ghost,GetMaxHp(ghost));
+		SetMana(ghost,GetMaxMana(ghost));
+		SetStamina(ghost,GetMaxStamina(ghost));
+		ghost.warmode:= 0;
+		ghost.hidden:=1;
+		return;
+	endif
+
+	SetObjProperty(ghost,"death",ReadGameClock()+3600);
+
+	// Play the "death" music midi
+	PlayMusic( ghost, "2A" );
+
+endprogram
+
+
+function teamctf(ghost,corpse)
+
+Resurrect(ghost);
+DestroyItem(GetEquipmentByLayer(ghost,LAYER_ROBE));
+
+var flaginhand:=0;
+
+// destroy flag
+foreach item in EnumerateItemsInContainer(corpse)
+if (item.objtype==0x7111 || item.objtype==0x7112) DestroyItem(item); flaginhand:=1; endif
+if (GetObjProperty(item,"StayEquipped"))
+item.movable:=1;
+EquipItem(ghost,item);
+item.movable:=0;
+endif
+endforeach
+
+CurePoison(ghost);
+
+SetObjProperty(ghost,"ctfdeaths",CInt(GetObjProperty(ghost,"ctfdeaths")+1));
+SetObjProperty(ghost,"totalctfdeaths",CInt(GetObjProperty(ghost,"totalctfdeaths")+1));
+SetObjProperty(ghost,"ctfloc",3);
+
+var par:=array,chr,i,ctfplyr:=GetGlobalProperty("#ctfplyr"),csize:=ctfplyr.size(),killer:=GetObjProperty(ghost,"KilledBy");
+
+if (killer!=ghost.name)
+
+for (i:=1;i<=csize;i:=i+1)
+chr:=SystemFindObjectBySerial(ctfplyr[i]);
+
+if (chr.name==killer)
+    if (flaginhand==1) SetObjProperty(chr,"ctfscore",GetObjProperty(chr,"ctfscore")+3); SetObjProperty(chr,"ctfddd",GetObjProperty(chr,"ctfddd")+1); scorecheck(chr,GetObjProperty(chr,"ctfscore")); endif
+    if (GetObjProperty(chr,"ctfddd")>=10)
+      SetObjProperty(chr,"ctfddd",0);
+      SetObjProperty(chr,"ctfdefense",GetObjProperty(chr,"ctfdefense")+1);
+      par[1]:=chr;
+      par[2]:="ddd";
+      start_script(":zuluctf:badge",par);
+    endif
+    SetObjProperty(chr,"ctfkills",GetObjProperty(chr,"ctfkills")+1);
+    SetObjProperty(chr,"totalctfkills",GetObjProperty(chr,"totalctfkills")+1);
+    start_script(":zuluctf:hud",chr);
+endif
+
+endfor
+
+if (flaginhand==1)
+
+i:=GetObjProperty(chr,"team");
+
+var fx,fy,fz;
+
+if (i=="BLUE")
+fx:=6119; fy:=358; fz:=-22;
+else
+fx:=6038; fy:=358; fz:=44;
+endif
+
+foreach mobile in ListMobilesNearLocation( fx,fy, fz, 10 );
+  if (GetObjProperty(mobile,"team")==i)
+    SetObjProperty(mobile,"ctfscore",GetObjProperty(mobile,"ctfscore")+1);
+    scorecheck(mobile,GetObjProperty(mobile,"ctfscore"));
+    SetObjProperty(mobile,"ctfooo",GetObjProperty(mobile,"ctfooo")+1);
+    if (GetObjProperty(mobile,"ctfooo")>=14)
+      SetObjProperty(mobile,"ctfooo",0);
+      SetObjProperty(mobile,"ctfoffense",GetObjProperty(mobile,"ctfoffense")+1);
+      par[1]:=mobile;
+      par[2]:="ooo";
+      start_script(":zuluctf:badge",par);
+      endif
+    start_script(":zuluctf:hud",mobile);
+  endif
+endforeach
+endif
+
+endif
+
+EraseObjProperty(ghost,"KilledBy");
+
+if(len(ghost.reportables)>0)
+foreach reportable in reportables
+    ghost.removeReportable(reportable.serial,reportable.gameclock);
+endforeach
+endif
+
+SetHp(ghost,ghost.strength);
+SetStamina(ghost,ghost.dexterity);
+SetMana(ghost,ghost.intelligence);
+
+start_script(":zuluctf:hud",ghost);
+start_script(":zuluctf:ctf_death",ghost);
+
+endfunction
+
+
+function scorecheck(who,score)
+
+if (score>GetObjProperty(who,"ctftopscore")) SetObjProperty(who,"ctftopscore",score); endif
+
+if(GetObjProperty(who,"team")=="BLUE")
+if (score>GetGlobalProperty("ctfbluescore")) SetGlobalProperty("ctfbluescore",score); endif
+else
+if (score>GetGlobalProperty("ctfredscore")) SetGlobalProperty("ctfredscore",score); endif
+endif
+
+endfunction
+
+
+
+function FindMyPack(myserial)
+    var mybank:=OpenTamedStorageAreas();
+    var bank_obj_name:="Bankbox  "+Hex(myserial);
+    var bankbox:=FindRootItemInStorageArea(mybank,bank_obj_name);
+
+    if (!bankbox) bankbox:=CreateRootItemInStorageArea(mybank,bank_obj_name,UOBJ_BANKBOX); endif
+
+    return bankbox;
+
+endfunction
+
+
+function OpenTamedStorageAreas()
+    var bank:=FindStorageArea("Tamed Storage");
+
+    if (!bank) bank:=CreateStorageArea("Tamed Storage"); endif
+
+    return bank;
+endfunction
+
+
+function ReequipCursed(ghost,corpse)
+
+	set_critical(1);
+	foreach item in EnumerateItemsInContainer(corpse)
+		if(GetObjProperty(item,"StayEquipped"))
+			EquipItem(ghost,item);
+		endif
+	endforeach
+
+	foreach item in EnumerateItemsInContainer(ghost.backpack)
+		if(GetObjProperty(item,"StayEquipped"))
+			EquipItem(ghost,item);
+		endif
+	endforeach
+	set_critical(0);
+
+endfunction
+
+/*
+		foreach item in EnumerateItemsInContainer( corpse )
+		
+		var ret := MoveItemToContainer(item, ghost.backpack);
+		
+		if(ret == error)
+		print(ret.errortext);
+		endif
+*/

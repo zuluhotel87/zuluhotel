@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setintmod( who,  intmod )
+    SetIntelligenceMod(who, CInt(intmod));
+endprogram

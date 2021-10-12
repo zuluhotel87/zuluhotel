@@ -1,0 +1,11 @@
+use uo;
+use os;
+include "include/attributes";
+
+
+program guardhitscript(attacker, defender, weapon, armor, basedamage, rawdamage)
+
+	ApplyRawDamage( defender, CInt(GetHp(defender) + 3) );
+	SetObjProperty( defender, "guardkill", 1 );
+
+endprogram

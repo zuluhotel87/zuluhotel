@@ -1,0 +1,11 @@
+use uo;
+
+program defrog(character, frog)
+
+foreach person in EnumerateOnlineCharacters()
+        if (character.name == frog)
+                person.graphic := 0x190;
+        endif
+endforeach
+
+endprogram

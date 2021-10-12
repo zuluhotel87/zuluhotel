@@ -1,0 +1,12 @@
+use uo;
+
+program StayEquipped( who )
+
+      var item := Target( who );
+	if( item.objtype )
+		SetObjProperty( item, "StayEquipped", 1 );
+	endif
+
+endprogram
+
+ 

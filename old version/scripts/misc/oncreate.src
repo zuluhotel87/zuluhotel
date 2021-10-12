@@ -1,0 +1,46 @@
+//
+// oncreate.src: Runs on character creation
+//
+// Notes:
+//    runs critical (may be changed to just run to completion)
+//    parameters are (who, skillids)
+//       who: character created
+//       skillids: array of skillid integers
+//    
+
+use uo;
+
+include "include/starteqp";
+include "include/attributes";
+
+program oncreate(who,skillids)
+    print( "Character created: "+who.name );
+    var strength := GetStrength(who);
+    var dexterity := GetDexterity(who);
+    var intelligence := GetIntelligence(who);
+    var total := strength + dexterity + intelligence;
+
+
+if((13 in CAscZ(who.name)) || (10 in CAscZ(who.name)))
+    var account := who.acct;
+    account.ban();
+    for i:=1 to 5
+      account.DeleteCharacter( i );
+    endfor
+    syslog("ALERT! Account " + account.name + " was banned for cheating.");
+endif
+
+	if( total > 65 )
+    	who.setStrength(CInt(strength*65/total));
+    	who.setDexterity(CInt(dexterity*65/total));
+    	who.setIntelligence(CInt(intelligence*65/total));
+    endif
+   
+    CreateStartingEquipment(who,skillids);
+
+    SendSysMessage(who,"Pick the race you would like to be.");
+    SetObjProperty(who,"newbie",1);
+    SetObjProperty(who, "cors",1);
+    MoveCharacterToLocation(who,5561,1169,0,MOVECHAR_FORCELOCATION);
+
+endprogram

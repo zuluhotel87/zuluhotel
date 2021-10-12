@@ -1,0 +1,12 @@
+use os;
+use uo;
+
+// .unban <accountname>
+//
+use uo;
+
+program textcmd_unban( who )
+
+        SendSysMessage( who, ".account <accountname> ban|unban|enable|disable" );
+
+endprogram

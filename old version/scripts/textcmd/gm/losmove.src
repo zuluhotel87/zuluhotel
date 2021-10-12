@@ -1,0 +1,19 @@
+//
+// Cause another to perform an action by number
+//
+
+use uo;
+use os;
+
+include "include/client";
+include "include/utility";
+include "include/eventid";
+include "include/std";
+
+var ok;
+program move_item(who)
+	var selecteditem := Target( who, TGTOPT_NOCHECK_LOS );
+	if (selecteditem)
+		MoveItemToForcedLocation(selecteditem, who.x,who.y,who.z);
+	endif
+endprogram

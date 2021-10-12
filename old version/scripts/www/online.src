@@ -1,0 +1,16 @@
+use http;
+use uo;
+
+var players := EnumerateOnlineCharacters();
+
+  WriteHtml( "<html><head><title>POL On-Line Characters</title></head>"   );
+  WriteHtml(            "<body bgcolor=#000000 topmargin=0 leftmargin=0 background=images/back_news2.jpg bgproperties='fixed'>"   );
+  WriteHtml(             "<table border='0' width='400' cellspacing='0' cellpadding='0'><tr><td width='435'><p align='justify'><b><font size='2' face='Verdana' color='#C0C0C0'>Zulu"   );
+WriteHtml(             " Hotel First Age - Players Online</font></b><br><br><font face=Verdana size=2 color=#FFFFFF><b>Caracters Currently Online: <font color='#ff0000'>" + len(players) + "<br></font> "   );
+	WriteHtml(             "<br><font face='Verdana' size='2' color='#FFFFFF'>"   );
+  foreach chr in EnumerateOnlineCharacters()
+    if(chr.cmdlevel < 1)
+      WriteHtml( "<font face='Verdana' size='2' color='#FF0000'>" + chr.name + "<br>" );
+    endif
+  endforeach
+  WriteHtml( "</BODY></HTML>" );

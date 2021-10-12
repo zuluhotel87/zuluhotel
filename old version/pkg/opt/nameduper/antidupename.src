@@ -1,0 +1,39 @@
+use os;
+use uo;
+use util;
+use basic;
+use cfgfile;
+
+program antidupename(who)
+
+var hisname := lower(who.name);
+
+var cfg := readconfigfile("usednames");
+
+var elem := findconfigelem(cfg, hisname);
+
+if (!elem)
+SendSysMessage(who,"Wait, checking your name...");
+addname(who, hisname);
+sleep(4);
+SendSysMessage(who, "Name checked. Have a nice day!"); 
+movecharactertolocation(who, 5430, 1268, 0, MOVECHAR_FORCELOCATION);
+else
+SendSysMessage(who,"Sorry, but this name is already used. Call staff to change it or create a new character.");
+return 0;
+endif
+endprogram
+
+function addname(who, nome)
+
+	var elem := {};
+	var elems := array;
+	elem.+pname;
+	elem.+pvalue;
+	var rcfg := readconfigfile("usednames");
+	elem.pname := "Name";
+	elem.pvalue := nome;
+	elems[1] := elem;
+	AppendConfigFileElem( "usednames", "Name", who.name, elems );
+	unloadconfigfile("usednames");
+endfunction

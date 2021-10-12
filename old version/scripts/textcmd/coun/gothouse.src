@@ -1,0 +1,23 @@
+use uo;
+use os;
+
+program thurildickzor(who);
+sendsysmessage(who, "Who?");
+
+var pinto:=Target(who);
+
+if(!pinto)
+SendSysMessage(who, "Cancelled");
+return;
+endif
+
+if(pinto.npctemplate)
+SendSysMessage(who, "Youre a big dumbass...");
+return;
+endif
+
+var aconta:=who.acct;
+aconta.eraseprop("JaTemCasa");
+SendSysMessage(who, "Done !");
+
+endprogram

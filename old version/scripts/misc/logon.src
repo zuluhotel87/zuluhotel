@@ -1,0 +1,9 @@
+use uo;
+use os;
+
+program logon( who )
+
+	print( "logon: " + who.name );
+	start_script( "::playermanager", who );
+
+endprogram

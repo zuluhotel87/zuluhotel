@@ -1,0 +1,8 @@
+use uo;
+include "include/random";
+
+program dicetest( who )
+
+    SendSysMessage( who, who.name + "rolls " + RandomDiceStr( 6 ) + " and " + RandomDiceStr( 6 ) );
+
+endprogram

@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setstrmod( who, strmod )
+    SetStrengthMod(who, CInt(strmod));
+endprogram

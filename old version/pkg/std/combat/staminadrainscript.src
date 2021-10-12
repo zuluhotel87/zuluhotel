@@ -1,0 +1,39 @@
+use uo;
+use os;
+
+include "include/hitscriptinc";
+include "include/attributes";
+include "include/client";
+
+
+program staminadrainscript(attacker, defender, weapon, armor, basedamage, rawdamage)
+
+	var drained;
+	var drainer;
+	
+	rawdamage := RecalcDmg( attacker, defender, weapon, armor, basedamage );
+
+	if( GetObjProperty( weapon, "Cursed" ) )
+		drained := attacker;
+		drainer := defender;
+	else
+		drained := defender;
+		drainer := attacker;
+	endif
+
+	var amount := rawdamage / 2;
+
+	if( amount > GetStamina(drained))
+		SetStamina(drained, 0);
+	else
+		SetStamina(drained, GetStamina(drained) - amount);
+	endif
+
+	SetStamina(drainer, GetStamina(drainer) + amount);
+	if( GetStamina(drainer) > GetMaxStamina(drainer))
+		SetStamina(drainer, drainer.maxstamina);
+	endif
+
+	DealDamage( attacker, defender, weapon, armor, basedamage, rawdamage );
+
+endprogram

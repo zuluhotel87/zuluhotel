@@ -1,0 +1,36 @@
+use uo;
+use os;
+
+include "util/bank";
+
+program movethingstowipe(who)
+SendSysMessage(who, "Well, the process have been started !");
+sleep(1);
+var contador:=0;
+var allaccts:= ListAccounts();
+  foreach Zaccount in allaccts
+    var account := FindAccount(Zaccount);
+
+for i:=1 to 5
+    var player:=account.GetCharacter(i);
+       if(player)
+//Get Bankbox
+    var bankbox:=FindBankBox(player);
+  if (bankbox)
+  contador:=contador+1;
+//Get backpack
+       var mybag:=EnumerateItemsinContainer(player.backpack);
+          foreach thinge in mybag
+        thinge.movable:=1;
+              MoveItemToContainer(thinge, bankbox);
+          endforeach
+ endif
+endif
+endfor
+endforeach
+SendSysMessage(who, "Finish ! IF everything is fine, "+contador+" accounts were changed.");
+endprogram
+
+
+
+

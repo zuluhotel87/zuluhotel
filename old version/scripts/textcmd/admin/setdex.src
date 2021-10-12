@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setdex( who, newdex )
+    SetBaseDexterity(who, CInt(newdex) );
+endprogram

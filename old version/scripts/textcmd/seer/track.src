@@ -1,0 +1,10 @@
+use uo;
+use os;
+
+program identify( who )
+
+	start_script( ":tracking:tracking", who );
+
+endprogram
+
+ 

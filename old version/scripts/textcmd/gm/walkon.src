@@ -1,0 +1,11 @@
+use uo;
+
+program textcmd_destroy( who, text )
+
+	var item := Target( who );
+
+	if (item)
+            item.walkonscript := text;
+    	endif
+
+endprogram

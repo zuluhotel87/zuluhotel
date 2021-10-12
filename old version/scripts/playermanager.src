@@ -1,0 +1,214 @@
+use uo;
+use os;
+
+include "include/time";
+include "include/classes";
+include "../../pkg/opt/karmafame/karmafame";
+include "include/dotempmods";
+
+program logon( who )
+
+	//setchat(who);
+	var acc := who.acct;
+set_critical(1);
+
+
+
+ if(GetObjProperty(who, "CapOff"))
+EraseObjProperty(who, "CapOff");
+endif
+
+if(GetObjProperty(who, "IsLiche"))
+	fixcolor(who);
+	EraseObjProperty(who,"IsLiche");
+	EraseObjProperty(who,"Type");
+endif
+
+
+set_critical(0);
+
+	acc.setprop("Login", NowString());
+	acc.setprop("IP", who.ip);
+	SetObjProperty(who, "#logontime", ReadGameClock() );
+
+	set_critical(1);
+	WipeMods(who);
+	CurePoison(who);
+	set_critical(0);
+
+	var macrowhen := GetMacroString();
+	var description := GetGlobalProperty("QuestDescription");
+	if( !description )
+		description := "";
+	endif
+
+	if( who.cmdlevel )
+		var gmpages := GetGlobalProperty("gmpages");
+		var counpages := GetGlobalProperty("counpages");
+		//SendStringAsTipWindow( who, "Welcome to Zulu Hotel First Age                                                                              There are " + CInt(gmpages.size()/2) + " page(s).                                                                         If you find a bugged item, spawn or npc PLEASE report it, thank you!");
+	else
+		//SendStringAsTipWindow( who, "Welcome to Zulu Hotel First Age                                                              Last Change (21/08/2004) - Testing the new server and waiting response from players to request us the bugs that exists on the Shard. Have a nice game !                                                                         If you find a bugged item, spawn or npc PLEASE report it, thank you !");
+		StartScripts(who);
+		AssignClasse(who);
+		SetNewNotoName(who);
+		//SetNewbieStatus(who);
+		var release := acc.getprop("Release");
+		if( who.x >= 5272 )
+			if( who.x <= 5310 )
+				if( who.y >= 1160 )
+					if( who.y <= 1190 )
+						if( release != 0 )
+							if (who.cmdlevel<1)	
+							var timeremaining := ((release - ReadGameClock())/86400) + 1;
+							MoveCharacterToLocation( who, 5691, 2365, 0, 0);
+							SendSysMessage(who, "You have " + timeremaining + " day(s) left in jail.");
+							sleep(5);
+							DisconnectClient(who);
+						else
+							acc.setprop("Release",0);
+		 					MoveCharacterToLocation( who, 1475, 1645, 20, 0);
+		 					SendSysMessage(who, "You are freed.");
+		 				endif
+		 			endif
+		 		endif
+		 	endif
+		endif
+					
+	endif
+endif
+
+//No cheaters ever
+
+if (who.cmdlevel>1)
+who.movable:=0;
+var pass:="ture04";
+var merde:= SendTextEntryGump(who, "Type the secret staff's Password", TE_CANCEL_ENABLE, TE_STYLE_NORMAL, 10);
+if(!merde)
+SendSysMessage(who, "Dont play with me !");
+sleep(1);
+DisconnectClient(who);
+endif
+if(merde==pass)
+SendSysMessage(who, "Welcome back, Mr Staff");
+who.movable:=1;
+return;
+else
+SendSysMessage(who, "PASSWORD WRONG !!");
+sleep(1);
+DisconnectClient(who);
+endif
+endif
+endprogram
+
+
+function StartScripts(who)
+
+	var process := {};
+	process.append(start_script(":cooking:hunger",who).pid);
+	process.append(start_script(":areas:areaban", who ).pid);
+	SetObjProperty( who, "#RunningScripts", process );
+
+/*
+	var ctf:=getobjproperty(who,"ctfloc");
+
+	if(who.cmdlevel>0) return; endif
+
+	if (ctf<=3 && ctf>=0)
+	MoveCharacterToLocation(who,6083,450,-22);
+	setobjproperty(who,"ctfloc",0);
+	else*/
+
+endfunction
+
+
+function setchat(who)
+
+	while (GetGlobalProperty("plylock")==1)
+	sleep(10);
+	endwhile
+
+	set_critical(1);
+	SetGlobalProperty("plylock",1);
+
+	var plychat:=GetGlobalProperty("plychat"),csize:=plychat.size();
+
+	if (plychat[1]=="NONE") csize:=0; endif
+
+	plychat[csize+1]:=who.serial;
+
+	SetGlobalProperty("plychat",plychat);
+	SetGlobalProperty("plylock",0);
+	set_critical(0);
+
+endfunction
+
+
+function SetNewbieStatus(player)
+
+	if (player.cmdlevel>0) return 0; endif
+
+	var newbieflag := GetObjProperty(player, "newbie");
+
+	//Make sure we don't tag twice
+	var result:=find(player.name," [New]",1);
+	if (result)
+		if (!newbieflag)
+			SetObjProperty(player,"newbie", 1);
+		endif
+		return 0;
+	endif
+
+	if (newbieflag)
+		return 0;
+	endif
+
+	var gametime := GetObjProperty(player, "onlinetimer");
+
+	if (!gametime || (gametime < 1000000))
+		player.name := player.name + " [New]";
+		SetObjProperty(player,"newbie", 1);
+	endif
+endfunction
+
+function fixnameguild(who)
+var abv:=getobjproperty(who,"abv"),result:=find(who.name," ["+abv+"]",1),name:=who.name;
+
+result:=result-1;
+name:=name[1,result];
+who.name:=name;
+endfunction
+
+
+function findgm(guild)
+
+var returninfo:={"In Vote","0"},i,all:=guild.members,gm:=guild.getprop("gm");
+
+for(i:=1;i<=all.size();i:=i+1)
+if (all[i].serial==gm) returninfo[1]:=all[i].name; returninfo[2]:=all[i].serial; returninfo[3]:=all[i]; endif
+endfor
+
+return returninfo;
+
+endfunction
+
+function fixcolor(who)
+
+	var newcolor, racepicked := who.title_race;
+
+	if (racepicked=="Elf")
+		newcolor := 770;
+	elseif (racepicked=="Dark-Elf")
+		newcolor := 33877;
+	elseif (racepicked=="Goblin")
+		newcolor := 34186;
+	elseif (racepicked=="Barbarian")
+		newcolor := 33804;
+	elseif (racepicked=="Dwarf")
+		newcolor := 33888;
+	else
+		newcolor := who.truecolor;
+	endif
+
+	who.color := newcolor;
+
+endfunction

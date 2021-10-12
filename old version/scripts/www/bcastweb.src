@@ -1,0 +1,41 @@
+/////////////////
+// Web POL Account adder for use with the POL web server
+//
+// * place webacct.ecl and acctadd.html in the pol/scripts/www directory
+// * enable the POL webserver in pol.cfg and set the port for http connections
+// * set WebServerLocalOnly=1 to only allow connections from the server 
+//   set it =0 to allow everyone to access the server and the account adder page
+// * accounts will be available immediately if successfully added
+// 
+// Notes: I don't know if someone's done something that serves this function
+//        but I thought I'd do it just for kicks.
+//
+// Author: Racalac, 2/6/00
+/////////////////
+
+use http;
+use uo;
+
+program account_add()
+
+local acctname := QueryParam( "acctname" );
+local acctpass := QueryParam( "acctpass" );
+local message  := QueryParam( "message" );
+
+writehtml("<html><head><title>Send a message to the shard</title></head><body>");
+writehtml("<FONT SIZE=4><B>Send a message to the shard</B></FONT><HR>");
+
+if (acctname=="zh1astaff" and acctpass=="zh1abasi cs")
+ if( !acctname or !acctpass )
+  writehtml("Name or Pass was empty.");
+ elseif (!message)
+  writehtml("There was no message.");
+ else
+  writehtml("message broadcast: " + acctname + ":" + message);
+  Broadcast( acctname + ":" + message );
+ endif
+else
+Writehtml("oops, something is not right.");
+endif
+
+endprogram

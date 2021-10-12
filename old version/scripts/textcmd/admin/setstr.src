@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setstr( who, newstr )
+    SetBaseStrength(who, CInt(newstr) );
+endprogram

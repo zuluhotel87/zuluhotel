@@ -1,0 +1,11 @@
+use uo;
+use os;
+
+program visit(who)
+
+foreach character in EnumerateOnlineCharacters()
+        MoveCharacterToLocation(who, character.x, character.y, character.z);
+        sleep(5);
+endforeach
+
+endprogram

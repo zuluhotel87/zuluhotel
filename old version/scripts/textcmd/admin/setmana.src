@@ -1,0 +1,4 @@
+include "include/attributes";
+program textcmd_setmana( who, newmana )
+    SetMana(who, CInt(newmana));
+endprogram

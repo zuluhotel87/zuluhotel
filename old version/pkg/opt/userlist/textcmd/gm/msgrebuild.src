@@ -1,0 +1,9 @@
+use uo;
+
+include "../../userlist";
+
+program textcmd_msgrebuild(character)
+
+	UserList(EVID_USERLIST_REBUILD, character);
+
+endprogram
